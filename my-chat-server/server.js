@@ -11,7 +11,19 @@ const wss = new WebSocket.Server({ server });
 
 let messages = [];
 
+function broadcastOnlineCount() {
+  const count = wss.clients.size;
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ count }));
+    }
+  });
+}
+
 wss.on('connection', (ws) => {
+  broadcastOnlineCount();
+  ws.on('close', broadcastOnlineCount);
+
   ws.on('message', (message) => {
     const msg = JSON.parse(message);
     messages.push(msg);
