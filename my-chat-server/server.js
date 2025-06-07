@@ -26,6 +26,10 @@ wss.on('connection', (ws) => {
   ws.send(JSON.stringify({ type: 'history', messages }));
 });
 
+// Serve static React files
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// API routes
 app.get('/chat/getchat/', (req, res) => {
   res.json({ chat: messages });
 });
@@ -34,11 +38,8 @@ app.get('/', (req, res) => {
   res.send('Chat server is running!');
 });
 
-// Serve static React files
-app.use(express.static(path.join(__dirname, '../dist')));
-
-// Fallback for SPA
-app.get('*', (req, res) => {
+// SPA fallback (must be last)
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist', 'index.html'));
 });
 
